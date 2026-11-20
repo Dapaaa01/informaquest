@@ -1075,7 +1075,7 @@ function selectAnswer(selectedIdx) {
     syncCoinDisplays();
 
     banner.classList.add("show", "is-correct");
-    fbTitle.textContent = `✓ TEPAT! +${earnedExp} EXP & +◈ ${earnedCoins}`;
+    fbTitle.textContent = `✓ TEPAT! +${earnedExp} EXP & +${earnedCoins} COINS`;
   } else {
     doubleExpActive = false;
     SoundEngine.playWrong();
