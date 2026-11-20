@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InformaQuest // 3D Learning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/curriculum.js"></script>
+  <script src="js/three-models.js"></script>
+<body>
+
+  <div class="arcade-grid-bg"></div>
+
+  <div class="app-shell" id="app-shell">
+
+    <!-- GLOBAL TOP NAVBAR -->
+    <header class="arcade-navbar" id="global-navbar">
+      <div class="brand-group" onclick="handleBrandClick()">
+        <div class="brand-badge">IQ</div>
+        <span class="brand-name">InformaQuest</span>
+      </div>
+
+      <div class="nav-center-pills">
+        <button id="audio-toggle-btn" class="tactile-pill" onclick="toggleAudioSystem()">
+          🔊 SFX: ON
+        </button>
+      </div>
+
+      <div class="nav-right-actions" id="global-nav-actions">
+        <button class="btn-tactile btn-cream btn-sm" onclick="openLeaderboardScreen()">
+          🏆 PODIUM
+        </button>
+      </div>
+    </header>
+
+    <!-- =================================================
+         1. LANDING PAGE (SEIMBANG KIRI & KANAN)
+         ================================================= -->
+    <main id="screen-login" class="screen active">
+      <section class="hero-stage">
+        <!-- KOLOM KIRI: HEADLINE + FORM LOGIN/DAFTAR -->
+        <div class="hero-left">
+          <div class="hero-intro-block">
+            <div class="sticker-tag">✦ CURRICULUM EDITION // 1.0</div>
+            <h1 class="display-h1">
+              KUASAI <span class="hl-lime">INFORMATIKA</span> LEWAT ARENA <span class="hl-orange">3D</span>.
+            </h1>
+            <p class="hero-sub">
+              Pelajari materi unit di samping, uji pemahamanmu melalui inspeksi objek 3D interaktif, dan kumpulkan koin untuk item bantuan di Shop.
+            </p>
+          </div>
+
+          <div class="auth-board-box">
+            <div class="auth-tabs">
+              <button id="tab-login" class="tab-brick active" onclick="switchAuthMode('login')">🔑 MASUK AKUN</button>
+              <button id="tab-register" class="tab-brick" onclick="switchAuthMode('register')">✨ DAFTAR BARU</button>
+            </div>
+
+            <div class="auth-form-stack">
+              <div class="form-split">
+                <div class="field-unit">
+                  <label for="auth-username">USERNAME MAHASISWA</label>
+                  <input type="text" id="auth-username" placeholder="RakaInformatika" maxlength="20" />
+                </div>
+                <div class="field-unit">
+                  <label for="auth-pin">PIN AKSES</label>
+                  <input type="password" id="auth-pin" placeholder="4-6 digit" maxlength="10" />
+                </div>
+              </div>
+
+              <div id="register-avatar-field" class="field-unit" style="display: none;">
+                <label>PILIH AVATAR (1 KARAKTER)</label>
+                <div class="avatar-strip" id="register-avatar-picker">
+                  <button type="button" class="av-tile selected" data-av="🤖" onclick="selectRegisterAvatar(this)">🤖</button>
+                  <button type="button" class="av-tile" data-av="👾" onclick="selectRegisterAvatar(this)">👾</button>
+                  <button type="button" class="av-tile" data-av="👽" onclick="selectRegisterAvatar(this)">👽</button>
+                  <button type="button" class="av-tile" data-av="👻" onclick="selectRegisterAvatar(this)">👻</button>
+                  <button type="button" class="av-tile" data-av="🧙‍♂️" onclick="selectRegisterAvatar(this)">🧙‍♂️</button>
+                  <button type="button" class="av-tile" data-av="🦊" onclick="selectRegisterAvatar(this)">🦊</button>
+                  <button type="button" class="av-tile" data-av="🐼" onclick="selectRegisterAvatar(this)">🐼</button>
+                  <button type="button" class="av-tile" data-av="🐸" onclick="selectRegisterAvatar(this)">🐸</button>
+                </div>
+              </div>
+
+              <div id="auth-error-msg" class="error-strip"></div>
+
+              <button id="auth-submit-btn" class="btn-tactile btn-lime btn-block" onclick="handleAuthSubmit()">
+                <span>🚀 MULAI LINTASAN BELAJAR</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KOLOM KANAN: DEK MATERI SECTION 1 (1.1 - 1.5) & SECTION 2 (2.1 - 2.5) -->
+        <div class="hero-right">
+          <div class="deck-card">
+            <!-- Bar Section Utama + Panah Geser Section -->
+            <div class="deck-topbar">
+              <div class="deck-sec-switch">
+                <button class="btn-mini-nav" onclick="switchReadingSection(-1)" title="Section Sebelumnya">◀</button>
+                <div class="deck-pills" id="reading-section-tabs">
+                  <button class="d-pill active" onclick="selectReadingSection(1)">📘 SECTION 1</button>
+                  <button class="d-pill" onclick="selectReadingSection(2)">📗 SECTION 2</button>
+                </div>
+                <button class="btn-mini-nav" onclick="switchReadingSection(1)" title="Section Berikutnya">▶</button>
+              </div>
+              <span id="reading-counter" class="mono-badge">UNIT 1.1</span>
+            </div>
+
+            <!-- Sub-Tab Unit (1.1 - 1.5 atau 2.1 - 2.5) -->
+            <div class="deck-unit-bar" id="reading-unit-tabs"></div>
+
+            <div class="deck-main">
+              <div class="deck-heading-box">
+                <span id="reading-kicker" class="deck-kicker">SECTION 1 // UNIT 1.1</span>
+                <h2 id="reading-title" class="deck-title">Fondasi Informatika</h2>
+              </div>
+
+              <div id="reading-content" class="deck-scroll-area"></div>
+
+              <div class="deck-ref-footer">
+                <span class="ref-tag">📚 SUMBER REFERENSI PUSTAKA:</span>
+                <p id="reading-reference" class="ref-copy"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- =================================================
+         2. MENU UTAMA (PETA LINTASAN SEIMBANG)
+         ================================================= -->
+    <main id="screen-map" class="screen">
+      <div class="board-layout">
+        <aside class="board-sidebar">
+          <div class="player-pass-card" onclick="openProfileScreen()">
+            <div class="pass-header">
+              <div id="map-player-avatar" class="pass-avatar mono">A</div>
+              <div>
+                <div id="map-player-name" class="pass-name">Pemain</div>
+                <div id="map-player-rank-title" class="pass-role">🎓 MAHASISWA</div>
+              </div>
+            </div>
+
+            <div class="pass-stats-row">
+              <div class="p-stat-box bg-yellow">
+                <span class="ps-lbl">⚡ TOTAL EXP</span>
+                <strong id="map-total-exp" class="mono">0</strong>
+              </div>
+              <div class="p-stat-box bg-lime">
+                <span class="ps-lbl">◈ COINS SHOP</span>
+                <strong id="map-total-coins" class="mono">◈ 0</strong>
+              </div>
+            </div>
+
+            <div class="pass-bar-wrap">
+              <div class="pass-bar-meta">
+                <span>🎯 PROGRES UNIT 1.1</span>
+                <span id="map-pct-text" class="mono">0%</span>
+              </div>
+              <div class="hard-progress">
+                <div id="map-mini-bar-fill" class="hard-progress-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="pass-cta">👤 BUKA PROFIL & LENCANA →</div>
+          </div>
+
+          <div class="warning-ticket">
+            <strong>🛡️ PROTOKOL LAYAR PENUH</strong>
+            <p>Setiap soal hanya dapat dimainkan <b>1 kali</b>. Keluar dari fullscreen, minimize, atau pindah tab akan menggagalkan soal tersebut (merah).</p>
+          </div>
+
+          <div class="sidebar-btn-stack">
+            <button class="btn-tactile btn-yellow btn-block" onclick="openLeaderboardScreen()">
+              🏆 PODIUM JUARA
+            </button>
+            <button class="btn-tactile btn-red btn-block" onclick="logoutUser()">
+              🚪 KELUAR AKUN
+            </button>
+          </div>
+        </aside>
+
+        <section class="track-arena">
+          <div class="track-banner">
+            <span class="sticker-tag bg-orange">📍 SECTION 1, UNIT 1</span>
+            <h2>FONDASI INFORMATIKA</h2>
+            <p>Selesaikan semua stage untuk mencapai Section 1, Unit 2 (1.2).</p>
+          </div>
+
+          <!-- Jalur Lintasan Soal 1-5 & Section 1, Unit 1.2 Coming Soon -->
+          <div class="board-track-container" id="duolingo-path"></div>
+        </section>
+      </div>
+    </main>
+
+    <!-- =================================================
+         3. LAYAR PROFIL MAHASISWA (SEIMBANG 1:1)
+         ================================================= -->
+    <main id="screen-profile" class="screen">
+      <div class="sub-nav-bar">
+        <button class="btn-tactile btn-cream btn-sm" onclick="backToMap()">
+          ← KEMBALI KE MENU UTAMA
+        </button>
+        <button class="btn-tactile btn-red btn-sm" onclick="logoutUser()">
+          🚪 LOGOUT
+        </button>
+      </div>
+
+      <div class="profile-grid">
+        <div class="profile-badge-card">
+          <div id="prof-avatar-big" class="prof-xl-av mono">A</div>
+          <h2 id="prof-username" class="prof-title">Username</h2>
+          <div id="prof-title-badge" class="role-sticker">🎓 MAHASISWA</div>
+
+          <div class="av-switch-strip">
+            <span>🎨 GANTI AVATAR (1 KARAKTER):</span>
+            <div class="av-mini-row">
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('🤖')">🤖</button>
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('👾')">👾</button>
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('👽')">👽</button>
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('👻')">👻</button>
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('🧙‍♂️')">🧙‍♂️</button>
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('🦊')">🦊</button>
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('🐼')">🐼</button>
+              <button class="av-mini-btn mono" onclick="updatePlayerAvatar('🐸')">🐸</button>
+            </div>
+          </div>
+
+          <div class="ach-board">
+            <div class="ach-board-head">
+              <span>🏅 LENCANA PENCAPAIAN</span>
+              <span id="prof-ach-counter" class="mono">0 / 5</span>
+            </div>
+            <div id="prof-achievements-list" class="ach-cards"></div>
+          </div>
+        </div>
+
+        <div class="profile-right-col">
+          <div class="kpi-tiles">
+            <div class="kpi-tile bg-yellow">
+              <span class="kt-lbl">⚡ AKUMULASI EXP</span>
+              <strong id="prof-total-exp" class="mono">0 EXP</strong>
+            </div>
+            <div class="kpi-tile bg-lime">
+              <span class="kt-lbl">◈ SALDO COINS</span>
+              <strong id="prof-total-coins" class="mono">◈ 0</strong>
+            </div>
+            <div class="kpi-tile bg-cream">
+              <span class="kt-lbl">⏱️ WAKTU DIHABISKAN</span>
+              <strong id="prof-time-spent" class="mono">0m 00s</strong>
+            </div>
+            <div class="kpi-tile bg-purple">
+              <span class="kt-lbl">🏆 PERINGKAT GLOBAL</span>
+              <strong id="prof-global-rank" class="mono">-</strong>
+            </div>
+          </div>
+
+          <div class="history-board">
+            <h3>📋 LOG SECTION 1, UNIT 1</h3>
+            <div id="prof-levels-breakdown" class="history-stack"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =================================================
+         4. MENU SOAL (ARENA KUIS 3D SEIMBANG 1:1)
+         ================================================= -->
+    <main id="screen-quiz" class="screen">
+      <div class="quiz-hud-bar">
+        <button class="btn-tactile btn-red btn-icon" onclick="confirmQuitExam()" title="Keluar & Gagalkan Soal">✕</button>
+        <div class="hud-lock-tag mono">🔒 FULLSCREEN</div>
+        <div class="hard-progress quiz-prog">
+          <div id="progress-fill" class="hard-progress-fill"></div>
+        </div>
+        <button id="quiz-audio-btn" class="btn-tactile btn-cream btn-sm mono" onclick="toggleAudioSystem()" title="Audio">🔊 SFX</button>
+        <div id="timer-pill" class="hud-counter bg-cream mono">⏱️ <span id="timer-display">30</span>s</div>
+        <div class="hud-counter bg-yellow mono">⚡ +<span id="session-exp-display">0</span> EXP</div>
+        <div class="hud-counter bg-lime mono">◈ <span id="quiz-coin-display">0</span></div>
+      </div>
+
+      <!-- Power-Up Action Bar selama Kuis -->
+      <div class="powerup-dock" id="quiz-powerup-dock"></div>
+
+      <div class="arena-split">
+        <div class="viewport-3d-frame">
+          <div class="vp-top-strip">
+            <span class="vp-hint">🖱️ DRAG 360° • SCROLL ZOOM</span>
+          </div>
+
+          <div id="three-canvas-container"></div>
+        </div>
+
+        <div class="question-board">
+          <div id="question-meta" class="q-tag mono">SOAL 1</div>
+          <h3 id="question-text" class="q-prompt">Memuat pertanyaan...</h3>
+          <div id="options-list" class="choices-stack"></div>
+        </div>
+      </div>
+
+      <div id="feedback-banner" class="feedback-strip">
+        <div class="fb-copy">
+          <h4 id="feedback-title">Jawaban Tepat!</h4>
+          <p id="feedback-desc">Penjelasan singkat.</p>
+        </div>
+        <button id="next-btn" class="btn-tactile btn-lime" onclick="nextQuestion()">
+          LANJUTKAN →
+        </button>
+      </div>
+    </main>
+
+    <!-- =================================================
+         5. MENU SELESAI MENGERJAKAN
+         ================================================= -->
+    <main id="screen-stage-clear" class="screen">
+      <div class="clear-box">
+        <div class="sticker-tag bg-lime" id="clear-badge">✓ SOAL 1 TUNTAS</div>
+        <h2 id="clear-title" class="display-h1" style="font-size: 2rem;">Progres Tersimpan!</h2>
+        <p id="clear-subtitle" class="hero-sub">Bagian ini telah ditandai selesai dan poin koin telah ditambahkan ke akunmu.</p>
+
+        <div class="kpi-tiles clear-kpi-4" style="max-width: 640px; margin: 22px auto;">
+          <div class="kpi-tile bg-lime">
+            <span class="kt-lbl">⚡ EXP DIDAPAT</span>
+            <strong id="clear-session-exp" class="mono">+0 EXP</strong>
+          </div>
+          <div class="kpi-tile bg-cyan">
+            <span class="kt-lbl">◈ COINS DIDAPAT</span>
+            <strong id="clear-session-coins" class="mono">+◈ 0</strong>
+          </div>
+          <div class="kpi-tile bg-yellow">
+            <span class="kt-lbl">🏆 TOTAL EXP</span>
+            <strong id="clear-total-exp" class="mono">0 EXP</strong>
+          </div>
+          <div class="kpi-tile bg-cream">
+            <span class="kt-lbl">⏱️ WAKTU</span>
+            <strong id="clear-time-taken" class="mono">0s</strong>
+          </div>
+        </div>
+
+        <div class="clear-btn-row">
+          <button class="btn-tactile btn-lime" onclick="backToMap()">
+            🗺️ LANJUT KE MENU UTAMA →
+          </button>
+          <button class="btn-tactile btn-yellow" onclick="openLeaderboardScreen()">
+            🏆 PODIUM JUARA
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- =================================================
+         6. MENU PODIUM & PAPAN PERINGKAT
+         ================================================= -->
+    <main id="screen-leaderboard" class="screen">
+      <div class="sub-nav-bar">
+        <button class="btn-tactile btn-cream btn-sm" onclick="returnFromLeaderboard()">
+          ← KEMBALI
+        </button>
+        <div style="width: 60px;"></div>
+      </div>
+
+      <div class="lb-banner">
+        <span class="sticker-tag bg-yellow">🏆 HALL OF FAME</span>
+        <h2 class="display-h1" style="font-size: 2rem;">PODIUM JUARA INFORMATIKA</h2>
+        <p class="hero-sub" style="margin-bottom: 0;">Peringkat Mahasiswa berdasarkan total akumulasi EXP tertinggi.</p>
+      </div>
+
+      <div class="podium-blocks">
+        <div class="podium-block p-silver">
+          <div class="p-rank-tag">🥈 JUARA 2</div>
+          <div id="p2-avatar" class="p-av mono">B</div>
+          <div id="p2-name" class="p-name">-</div>
+          <div id="p2-exp" class="p-exp mono">0 EXP</div>
+          <div id="p2-sub" class="p-sub">Mahasiswa</div>
+        </div>
+
+        <div class="podium-block p-gold">
+          <div class="p-rank-tag">🥇 JUARA 1</div>
+          <div id="p1-avatar" class="p-av mono">A</div>
+          <div id="p1-name" class="p-name">-</div>
+          <div id="p1-exp" class="p-exp mono">0 EXP</div>
+          <div id="p1-sub" class="p-sub">Mahasiswa</div>
+        </div>
+
+        <div class="podium-block p-bronze">
+          <div class="p-rank-tag">🥉 JUARA 3</div>
+          <div id="p3-avatar" class="p-av mono">C</div>
+          <div id="p3-name" class="p-name">-</div>
+          <div id="p3-exp" class="p-exp mono">0 EXP</div>
+          <div id="p3-sub" class="p-sub">Mahasiswa</div>
+        </div>
+      </div>
+
+      <div class="lb-sheet">
+        <div class="lb-sheet-head">
+          <span>📋 Peringkat Mahasiswa Lainnya</span>
+          <span id="leaderboard-status" class="mono" style="font-size: 0.76rem;">Memuat...</span>
+        </div>
+        <div class="table-scroll">
+          <table id="lb-table" class="arcade-table">
+            <thead>
+              <tr>
+                <th>RANK</th>
+                <th>MAHASISWA</th>
+                <th>STATUS</th>
+                <th>TOTAL EXP</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- =================================================
+       MODAL TOKO POWER-UP (INFORMAQUEST SHOP)
+       ================================================= -->
+  <div id="shop-modal-backdrop" class="modal-overlay">
+    <div class="modal-box shop-modal-card">
+      <div class="shop-modal-top">
+        <div>
+          <span class="sticker-tag bg-cyan" style="margin-bottom: 4px;">🛒 POWER-UP STORE</span>
+          <h3 class="modal-heading" style="margin-bottom: 0;">INFORMAQUEST SHOP</h3>
+        </div>
+        <div class="coin-pill mono">◈ <span id="shop-balance-display">0</span> COINS</div>
+      </div>
+      <p class="shop-sub">Gunakan poin koin hasil menjawab soal untuk membeli item bantuan yang dapat dipakai saat mengerjakan soal.</p>
+
+      <div id="shop-items-grid" class="shop-items-grid"></div>
+
+      <div style="margin-top: 18px;">
+        <button class="btn-tactile btn-cream btn-block" onclick="closeShopModal()">
+          TUTUP SHOP
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================
+       CUSTOM IN-APP MODAL (NOTIFIKASI & KONFIRMASI)
+       ================================================= -->
+  <div id="custom-modal-backdrop" class="modal-overlay">
+    <div id="custom-modal-card" class="modal-box">
+      <div id="custom-modal-icon" class="modal-badge mono">!</div>
+      <h3 id="custom-modal-title" class="modal-heading">Pemberitahuan</h3>
+      <p id="custom-modal-message" class="modal-body-text">Pesan notifikasi.</p>
+      <div id="custom-modal-actions" class="modal-btn-group"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
