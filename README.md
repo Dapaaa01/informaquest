@@ -3,7 +3,7 @@
 Aplikasi pembelajaran interaktif berbasis web 3D untuk materi **Fondasi Informatika**. Pengguna dapat mempelajari rangkuman materi terstruktur, menginspeksi model objek 3D secara 360°, mengerjakan kuis berbatas waktu dengan protokol layar penuh, mengumpulkan koin untuk membeli *power-up*, serta bersaing pada papan peringkat global.
 
 ## Live Demo
-👉 **[https://username-github-kamu.github.io/informaquest/](https://username-github-kamu.github.io/informaquest/)**
+👉 **[https://dapaaa01.github.io/informaquest/](https://dapaaa01.github.io/informaquest/)**
 
 ## Fitur Utama
 1. **Modul Bacaan Bertingkat:** Navigasi Section 1 (`1.1` – `1.5`) & Section 2 (`2.1` – `2.5`) lengkap dengan referensi pustaka.
